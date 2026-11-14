@@ -1,0 +1,22 @@
+{
+  "name": "ecoruta-tecsup",
+  "version": "1.0.0",
+  "description": "EcoRuta Tecsup - MVP de Carpooling Universitario (Evaluación de Recuperación - Construcción y Pruebas de Software)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/acceptance.test.js"
+  },
+  "keywords": [
+    "ecoruta",
+    "tecsup",
+    "carpooling",
+    "scrum",
+    "mvp"
+  ],
+  "author": "Kattherin",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
