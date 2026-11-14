@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tablero Miro — Evaluación de Recuperación Caso EcoRuta (Evidencias 1 a 20)</title>
+  <style>
+    :root {
+      --canvas-bg: #f0f2f5;
+      --frame-bg: #ffffff;
+      --frame-border: #cbd5e1;
+      --miro-yellow: #fff9b1;
+      --miro-green: #d5f692;
+      --miro-blue: #cde8ff;
+      --miro-pink: #ffcee0;
+      --miro-purple: #e6d6ff;
+      --miro-orange: #ffe2b8;
+      --primary: #0f764a;
+      --dark: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--canvas-bg);
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--dark);
+      padding: 24px;
+      line-height: 1.45;
+    }
+    .board-header {
+      background: #1e293b;
+      color: #ffffff;
+      padding: 18px 24px;
+      border-radius: 12px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .board-header h1 { font-size: 1.4rem; }
+    .board-header p { font-size: 0.88rem; color: #cbd5e1; }
+    .nav-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav-pills a {
+      color: #ffffff;
+      text-decoration: none;
+      background: rgba(255,255,255,0.14);
+      padding: 6px 12px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .nav-pills a:hover { background: #10b981; }
+    .miro-frame {
+      background: var(--frame-bg);
+      border: 2px solid var(--frame-border);
+      border-radius: 14px;
+      padding: 26px;
+      margin-bottom: 36px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+    }
+    .frame-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .frame-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      background: #e2e8f0;
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+    .ev-badge {
+      display: inline-block;
+      background: #0f764a;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 99px;
+      margin-bottom: 8px;
+    }
+    .sticky-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .sticky {
+      padding: 16px;
+      border-radius: 6px;
+      box-shadow: 2px 4px 10px rgba(0,0,0,0.08);
+      font-size: 0.88rem;
+    }
+    .sticky.yellow { background: var(--miro-yellow); }
+    .sticky.green { background: var(--miro-green); }
+    .sticky.blue { background: var(--miro-blue); }
+    .sticky.pink { background: var(--miro-pink); }
+    .sticky.purple { background: var(--miro-purple); }
+    .sticky.orange { background: var(--miro-orange); }
+    .sticky h4 { margin-bottom: 6px; font-size: 0.96rem; }
+    .sub-block {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+    .sub-block h3 { font-size: 1.05rem; margin-bottom: 10px; color: #0f172a; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      background: #ffffff;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 9px 11px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f1f5f9; font-weight: 700; }
+    .ok-tag {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+    }
+    .cut-line {
+      background: #fef2f2;
+      border: 2px dashed #dc2626;
+      color: #991b1b;
+      padding: 10px 14px;
+      text-align: center;
+      font-weight: 800;
+      border-radius: 8px;
+      margin: 14px 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="board-header">
+    <div>
+      <h1>Tablero de Evidencias (1 a 20) — Evaluación de Recuperación: Caso EcoRuta</h1>
+      <p>Construcción y Pruebas de Software · Tecsup 4to Ciclo · Docente: Edwin Córdova B. · Autora: Kattherin</p>
+    </div>
+    <nav class="nav-pills">
+      <a href="#parte1">Parte 1: Discovery (Ev. 1-4)</a>
+      <a href="#parte2">Parte 2: Vision Board (Ev. 5-6)</a>
+      <a href="#parte3">Parte 3: Backlog (Ev. 7-11)</a>
+      <a href="#parte4">Parte 4: Construcción (Ev. 12-16)</a>
+      <a href="#parte5">Parte 5: Cierre (Ev. 17-20)</a>
+      <a href="./index.html" style="background:#10b981;">Ir al MVP Interactivo →</a>
+    </nav>
+  </header>
+
+  <!-- MARCO 1 -->
+  <section id="parte1" class="miro-frame">
+    <div class="frame-title-bar">
+      <span class="frame-title">Parte 1 — Product Discovery</span>
+      <span>Evidencias 1, 2, 3 y 4</span>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 1 · Outcome Medible (1 sola frase, sin nombrar solución)</span>
+      <div class="sticky green" style="font-size:1.02rem; font-weight:700;">
+        "Lograr que al menos el 45 % de los estudiantes de Tecsup que se trasladan desde Lima Metropolitana compartan su viaje hacia el campus al menos 3 veces por semana, reduciendo su gasto diario de transporte en un 40 % y asegurando su llegada al menos 10 minutos antes del inicio de clases durante el semestre 2026-2."
+      </div>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 2 · 3 Entrevistas sobre Comportamiento Pasado (The Mom Test) + 4 Citas del Caso</span>
+      <div class="sticky-grid">
+        <div class="sticky yellow">
+          <h4>Entrevista E-01: Valeria Rojas (Ficticio) — Tiene auto</h4>
+          <p><strong>Pregunta Mom Test:</strong> "Cuéntame la última vez que llevaste compañeros a Tecsup, ¿qué pasó?"</p>
+          <p style="margin-top:6px;"><em>"El mes pasado llevé a dos amigos, pero uno me pidió recogerlo a cuatro cuadras de la Av. Brasil y me quedé atrapada 25 minutos en el tráfico interior. Llegamos tarde al laboratorio y desde ese día prefiero irme sola por la avenida principal."</em></p>
+        </div>
+        <div class="sticky yellow">
+          <h4>Entrevista E-02: Diego Huamán (Ficticio) — Sin auto</h4>
+          <p><strong>Pregunta Mom Test:</strong> "Háblame de la última semana en turno mañana, ¿cuánto gastaste y qué hiciste cuando demoró el bus?"</p>
+          <p style="margin-top:6px;"><em>"El martes esperé el bus en Evitamiento por más de 35 minutos; terminé pagando un taxi colectivo de S/ 14 para no perder la práctica. Sé que compañeros vienen en carro por Panamericana Norte, pero nunca sé a qué hora pasan por Puente Nuevo."</em></p>
+        </div>
+        <div class="sticky yellow">
+          <h4>Entrevista E-03: Camila Vargas (Ficticio) — Trabaja y estudia</h4>
+          <p><strong>Pregunta Mom Test:</strong> "¿Qué pasó la última vez que usaron WhatsApp para compartir auto en turno noche?"</p>
+          <p style="margin-top:6px;"><em>"Hace dos semanas un compañero publicó en WhatsApp que salía por Javier Prado a las 6:05 pm con 3 cupos. Respondieron 9 personas a la vez, nadie sabía quién alcanzó asiento, uno canceló a las 6:02 pm y el conductor no pudo leer el chat mientras manejaba."</em></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 3 · Mapa de Oportunidades (Outcome → 3 Oportunidades con Citas → Soluciones Distintas a lo Pedido)</span>
+      <div class="sticky-grid">
+        <div class="sticky blue">
+          <h4>Oportunidad 1: Acordar subida segura sin desviarse de la avenida principal</h4>
+          <p><strong>Citas:</strong> María (Caso) + Valeria Rojas (E-01).</p>
+          <p style="margin-top:6px;"><strong>Solución 1A (Elegida):</strong> Acceso exclusivo <code>@tecsup.edu.pe</code> + <strong>Paraderos Fijos Troncales</strong> sobre avenida principal (cero desvíos).</p>
+          <p><strong>Solución 1B:</strong> Puntos presenciales con código QR en parabrisas.</p>
+        </div>
+        <div class="sticky blue">
+          <h4>Oportunidad 2: Evitar el caos y sobrecupo al confirmar los asientos (1 a 4)</h4>
+          <p><strong>Citas:</strong> Luis (Caso) + Camila Vargas (E-03).</p>
+          <p style="margin-top:6px;"><strong>Solución 2A (Elegida):</strong> Reserva instantánea con <strong>descuento atómico de asientos y bloqueo automático al llegar a 0 cupos</strong> + liberación al cancelar.</p>
+          <p><strong>Solución 2B:</strong> Cola de espera automatizada por orden de llegada.</p>
+        </div>
+        <div class="sticky blue">
+          <h4>Oportunidad 3: Conocer qué compañeros pasan por el mismo corredor en mi horario</h4>
+          <p><strong>Citas:</strong> Jorge (Caso) + Ana (Caso) + Diego Huamán (E-02).</p>
+          <p style="margin-top:6px;"><strong>Solución 3A (Elegida):</strong> Cartelera filtrable por <strong>Corredor Vial y Ventana Horaria</strong> con hora estimada de llegada y aporte fijo visible.</p>
+          <p><strong>Solución 3B:</strong> Emparejamiento semanal fijo por bloque de horario.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 4 · Experimento Ejecutado Sin Programar Nada</span>
+      <table>
+        <thead>
+          <tr>
+            <th>Riesgo más incierto</th>
+            <th>Criterio de Confirmación vs. Descarte</th>
+            <th>Cómo se ejecutó (3 días)</th>
+            <th>Datos Reales Obtenidos</th>
+            <th>Decisión Tomada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Valor y Usabilidad:</strong> ¿Funcionará encontrarse en un único Paradero Fijo a hora exacta sin GPS en vivo ni pagos en la app?</td>
+            <td><strong>Confirma:</strong> &ge;75% cupos reservados sin caos y &ge;8/10 viajes puntuales.<br/><strong>Descarta:</strong> &lt;50% ocupación o reclamos por falta de GPS.</td>
+            <td>Hoja de cálculo restringida a correos <code>@tecsup.edu.pe</code> con 4 conductores y 12 pasajeros durante 3 días.</td>
+            <td><strong>23 de 26 asientos (88.5%)</strong> reservados con 0 sobrecupos; <strong>9 de 10 viajes (90%)</strong> puntuales en paradero fijo; 100% pagó directo al subir.</td>
+            <td><strong>CONFIRMADO:</strong> Construir MVP con paradero fijo y control de cupos, descartando GPS en vivo, pasarela y biometría.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MARCO 2 -->
+  <section id="parte2" class="miro-frame">
+    <div class="frame-title-bar">
+      <span class="frame-title">Parte 2 — Product Vision Board</span>
+      <span>Evidencias 5 y 6</span>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 5 · Las Cinco Áreas del Product Vision Board (Sin mencionar tecnologías)</span>
+      <div class="sticky-grid">
+        <div class="sticky purple">
+          <h4>1. VISIÓN</h4>
+          <p>Que ningún estudiante de Tecsup viaje solo en su auto ni gaste de más o llegue tarde por falta de transporte, conectando a compañeros de la misma ruta de forma segura, puntual y sin caos de coordinación.</p>
+        </div>
+        <div class="sticky yellow">
+          <h4>2. GRUPO OBJETIVO</h4>
+          <p>1) Estudiantes conductores de Tecsup con asientos libres (María, Luis, Valeria).<br/>2) Estudiantes pasajeros de Tecsup que buscan ahorrar y llegar puntuales a sus clases de mañana o noche (Jorge, Ana, Diego, Camila).</p>
+        </div>
+        <div class="sticky pink">
+          <h4>3. NECESIDADES</h4>
+          <p><strong>N1:</strong> Viajar solo con compañeros verificados de Tecsup subiendo en un paradero fijo sin desviarse.<br/><strong>N2:</strong> Asegurar entre 1 y 4 asientos exactos sin sobrecupo ni decenas de mensajes.<br/><strong>N3:</strong> Encontrar rutas por zona y horario sabiendo el aporte y hora de llegada.</p>
+        </div>
+        <div class="sticky green">
+          <h4>4. PRODUCTO</h4>
+          <p>Servicio de rutas compartidas Tecsup con: 1) Verificación por correo institucional, 2) Publicación con paradero fijo troncal y aporte claro, 3) Filtro por corredor y turno, 4) Reserva con bloqueo en 0 cupos y liberación por cancelación, 5) Manifiesto nominal de viaje.</p>
+        </div>
+        <div class="sticky orange">
+          <h4>5. OBJETIVOS DE NEGOCIO</h4>
+          <p><strong>ON-1:</strong> Lograr 50 rutas activas semanales en el primer mes.<br/><strong>ON-2:</strong> Que el 85 % de las rutas ocupe al menos 2 asientos con 0 incidentes de sobrecupo.<br/><strong>ON-3:</strong> Reducir en 40 % el gasto diario promedio de traslado (de S/ 15 a S/ 6).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 6 · Vínculo de cada Necesidad con su Oportunidad y su Cita</span>
+      <table>
+        <thead>
+          <tr>
+            <th>Necesidad (Product Vision Board)</th>
+            <th>Oportunidad (Parte 1)</th>
+            <th>Cita Textual de Respaldo (Caso + Entrevistas)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>N1:</strong> Coordinar con estudiantes de Tecsup en un paradero fijo sin desvíos.</td>
+            <td><strong>OP-1:</strong> Subida segura en avenida principal sin desviarse a calles internas.</td>
+            <td>María: <em>"No sé cómo coordinar con desconocidos de forma segura y sin que se me haga tarde por dar muchas vueltas."</em> + Valeria (E-01).</td>
+          </tr>
+          <tr>
+            <td><strong>N2:</strong> Controlar cupos exactos (1 a 4) y liberar asientos si alguien cancela.</td>
+            <td><strong>OP-2:</strong> Evitar el caos y sobrecupo al organizar quién ocupa el auto.</td>
+            <td>Luis: <em>"Me escribieron 10 personas a la vez. Fue un caos organizar quién iba al final."</em> + Camila (E-03).</td>
+          </tr>
+          <tr>
+            <td><strong>N3:</strong> Conocer rutas compatibles por zona y horario con gasto compartido claro.</td>
+            <td><strong>OP-3:</strong> Visibilidad de compañeros en la misma ruta y horario de entrada.</td>
+            <td>Jorge: <em>"Gasto casi 15 soles diarios... no conozco a nadie que haga mi misma ruta."</em> + Ana (Caso) + Diego (E-02).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MARCO 3 -->
+  <section id="parte3" class="miro-frame">
+    <div class="frame-title-bar">
+      <span class="frame-title">Parte 3 — Product Backlog</span>
+      <span>Evidencias 7, 8, 9, 10 y 11</span>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 7 · 5 Épicas Priorizadas con Criterio (Valor, Riesgo o Dependencia Técnica)</span>
+      <table>
+        <thead>
+          <tr>
+            <th>Orden</th>
+            <th>ID</th>
+            <th>Épica ("Como [rol], quiero [funcionalidad general]")</th>
+            <th>Criterio de Prioridad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1°</strong></td>
+            <td><strong>EP-01</strong></td>
+            <td>Como miembro de Tecsup, quiero autenticarme con mi correo institucional <code>@tecsup.edu.pe</code> para garantizar una comunidad verificada.</td>
+            <td><strong>Dependencia Técnica y Valor:</strong> Base obligatoria de identidad y confianza para todas las demás funciones.</td>
+          </tr>
+          <tr>
+            <td><strong>2°</strong></td>
+            <td><strong>EP-02</strong></td>
+            <td>Como estudiante conductor, quiero publicar y administrar mis rutas con paradero fijo, horario, aporte y límite de asientos.</td>
+            <td><strong>Dependencia Técnica y Alto Valor:</strong> Genera la oferta de rutas sin la cual no existen reservas.</td>
+          </tr>
+          <tr>
+            <td><strong>3°</strong></td>
+            <td><strong>EP-03</strong></td>
+            <td>Como estudiante pasajero, quiero buscar y filtrar rutas por corredor vial, turno horario y disponibilidad de asientos.</td>
+            <td><strong>Alto Valor:</strong> Resuelve el dolor de Jorge, Ana y Diego de encontrar viajes compatibles.</td>
+          </tr>
+          <tr>
+            <td><strong>4°</strong></td>
+            <td><strong>EP-04</strong></td>
+            <td>Como estudiante de Tecsup, quiero reservar asientos con bloqueo automático de sobrecupo, cancelar liberando el sitio y ver el manifiesto de viaje.</td>
+            <td><strong>Mitigación de Riesgo y Valor:</strong> Elimina el caos de WhatsApp reportado por Luis y Camila.</td>
+          </tr>
+          <tr>
+            <td><strong>5°</strong></td>
+            <td><strong>EP-05</strong></td>
+            <td>Como estudiante de Tecsup, quiero calificar la puntualidad post-viaje y reutilizar plantillas de rutas frecuentes.</td>
+            <td><strong>Menor Urgencia (Post-MVP):</strong> Mejora la retención futura pero no bloquea el flujo inicial.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 8 y Evidencia 10 · 12 Historias de Usuario (INVEST, Criterios Gherkin, Fibonacci vs Referencia H-01 = 2 pts) y Línea de Corte del MVP</span>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Historia ("Como... quiero... para...")</th>
+            <th>INVEST</th>
+            <th>Criterios de Aceptación ("Dado... cuando... entonces...")</th>
+            <th>Pts Fibonacci y Justificación (Ref: H-01 = 2 pts)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>H-01</strong><br/>(EP-01)</td>
+            <td>Como estudiante de Tecsup, quiero iniciar sesión con mi correo <code>@tecsup.edu.pe</code> para viajar solo con compañeros verificados.</td>
+            <td>✓ Cumple I-N-V-E-S-T</td>
+            <td><strong>C1:</strong> Dado correo <code>@tecsup.edu.pe</code> válido, cuando inicia sesión, entonces ingresa y muestra insignia verificada.<br/><strong>C2:</strong> Dado correo externo (<code>@gmail.com</code>), cuando intenta ingresar, entonces lo bloquea con código 403.</td>
+            <td><strong>2 pts</strong> — <em>Historia de referencia base</em> (validación de dominio + sesión).</td>
+          </tr>
+          <tr>
+            <td><strong>H-02</strong><br/>(EP-02)</td>
+            <td>Como estudiante conductor, quiero publicar mi ruta indicando zona, paradero fijo, horas, aporte y asientos (1-4) para no desviarme.</td>
+            <td>✓ Cumple I-N-V-E-S-T</td>
+            <td><strong>C1:</strong> Dado conductor autenticado, cuando publica ruta con 1-4 asientos y aporte S/ 0-15, entonces queda Activa.<br/><strong>C2:</strong> Dado asientos fuera de 1-4 o rol Pasajero, cuando envía el formulario, entonces el sistema lo rechaza.</td>
+            <td><strong>3 pts</strong> — Mayor que H-01 por validaciones múltiples de negocio y persistencia de ruta.</td>
+          </tr>
+          <tr>
+            <td><strong>H-03</strong><br/>(EP-03)</td>
+            <td>Como estudiante pasajero, quiero filtrar rutas por zona, horario y cupos libres para llegar a tiempo y ahorrar.</td>
+            <td>✓ Cumple I-N-V-E-S-T</td>
+            <td><strong>C1:</strong> Dado el listado, cuando filtra por zona o turno, entonces muestra solo rutas coincidentes.<br/><strong>C2:</strong> Dado el filtro "Solo con asientos libres", cuando busca, entonces oculta las rutas Completas (0 cupos).</td>
+            <td><strong>2 pts</strong> — Igual que H-01: filtrado parametrizado en API y renderizado dinámico.</td>
+          </tr>
+          <tr>
+            <td><strong>H-04</strong><br/>(EP-04)</td>
+            <td>Como estudiante pasajero, quiero reservar un asiento disponible con bloqueo automático al llegar a 0 para asegurar mi sitio sin caos.</td>
+            <td>✓ Cumple I-N-V-E-S-T</td>
+            <td><strong>C1:</strong> Dada ruta con cupo &gt; 0, cuando reserva, entonces resta 1 asiento y si llega a 0 cambia a "Completa".<br/><strong>C2:</strong> Dada ruta con 0 cupos o reserva duplicada, cuando intenta reservar, entonces el sistema lo impide con código 409.</td>
+            <td><strong>5 pts</strong> — Más del doble que H-01 por control atómico de asientos, duplicados y transición de estado.</td>
+          </tr>
+          <tr>
+            <td><strong>H-05</strong><br/>(EP-04)</td>
+            <td>Como estudiante pasajero, quiero cancelar mi reserva confirmada para liberar el asiento de inmediato para otro compañero.</td>
+            <td>✓ Cumple I-N-V-E-S-T</td>
+            <td><strong>C1:</strong> Dada reserva confirmada, cuando el pasajero cancela, entonces pasa a Cancelada y suma +1 asiento libre.<br/><strong>C2:</strong> Dada ruta "Completa" (0 cupos), cuando se cancela una reserva, entonces vuelve a estado "Activa" (1 cupo).</td>
+            <td><strong>3 pts</strong> — Ligeramente mayor que H-01 por actualizar reserva y reactivar ruta simultáneamente.</td>
+          </tr>
+          <tr>
+            <td><strong>H-06</strong><br/>(EP-04)</td>
+            <td>Como conductor o pasajero, quiero ver el manifiesto del viaje y paradero fijo acordado para abordar puntualmente.</td>
+            <td>✓ Cumple I-N-V-E-S-T</td>
+            <td><strong>C1:</strong> Dado conductor autenticado, cuando abre Mis Viajes, entonces ve la nómina de pasajeros confirmados.<br/><strong>C2:</strong> Dado pasajero autenticado, cuando abre Mis Viajes, entonces ve vehículo, horario, aporte y paradero fijo.</td>
+            <td><strong>2 pts</strong> — Igual que H-01: cruce relacional de rutas y reservas por usuario.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cut-line">
+        ✂️ LÍNEA DE CORTE DEL MVP (Evidencia 10): H-01 a H-06 (6 Historias = 17 Puntos) — Flujo completo de punta a punta que permite validar el Outcome en producción.
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID (Post-MVP)</th>
+            <th>Historia de Usuario (Backlog Futuro)</th>
+            <th>INVEST</th>
+            <th>Criterios de Aceptación (Resumen Gherkin)</th>
+            <th>Pts Fibonacci vs H-01</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>H-07</strong> (EP-02)</td>
+            <td>Como conductor, quiero suspender manualmente una ruta antes de partir para avisar un imprevisto.</td>
+            <td>✓ INVEST</td>
+            <td><strong>C1:</strong> Dada ruta activa, cuando la suspende, pasa a "Suspendida". <strong>C2:</strong> Impide nuevas reservas y avisa a inscritos.</td>
+            <td><strong>3 pts</strong> — Mayor que H-01 por cascada de estado.</td>
+          </tr>
+          <tr>
+            <td><strong>H-08</strong> (EP-02)</td>
+            <td>Como conductor frecuente, quiero duplicar una ruta anterior como plantilla para publicarla en 1 clic.</td>
+            <td>✓ INVEST</td>
+            <td><strong>C1:</strong> Dada ruta previa, cuando pulsa plantilla, autocompleta datos. <strong>C2:</strong> Al guardar crea nueva ruta activa.</td>
+            <td><strong>2 pts</strong> — Igual que H-01.</td>
+          </tr>
+          <tr>
+            <td><strong>H-09</strong> (EP-03)</td>
+            <td>Como pasajero, quiero ver la referencia peatonal y minutos de tolerancia del paradero fijo para no perder el auto.</td>
+            <td>✓ INVEST</td>
+            <td><strong>C1:</strong> Dada ruta con referencia, la muestra destacada. <strong>C2:</strong> Si no se ingresa, asigna tolerancia estándar de 5 min.</td>
+            <td><strong>1 pt</strong> — Menor que H-01 (campo informativo).</td>
+          </tr>
+          <tr>
+            <td><strong>H-10</strong> (EP-05)</td>
+            <td>Como estudiante, quiero calificar de 1 a 5 la puntualidad al terminar el viaje para reforzar la confianza.</td>
+            <td>✓ INVEST</td>
+            <td><strong>C1:</strong> Dado viaje finalizado, al calificar actualiza promedio. <strong>C2:</strong> Impide calificar dos veces el mismo viaje.</td>
+            <td><strong>5 pts</strong> — Mayor que H-01 por cálculo de reputación.</td>
+          </tr>
+          <tr>
+            <td><strong>H-11</strong> (EP-05)</td>
+            <td>Como conductor, quiero reportar inasistencia ("No-Show") en el paradero para evitar reservas fantasma.</td>
+            <td>✓ INVEST</td>
+            <td><strong>C1:</strong> Dada reserva activa, al marcar No-Show registra falta. <strong>C2:</strong> Con 3 faltas muestra alerta de puntualidad.</td>
+            <td><strong>5 pts</strong> — Mayor que H-01 por reglas de acumulación.</td>
+          </tr>
+          <tr>
+            <td><strong>H-12</strong> (EP-03)</td>
+            <td>Como estudiante, quiero ver mi ahorro acumulado en soles frente a tomar taxi (S/ 15) para medir mi beneficio.</td>
+            <td>✓ INVEST</td>
+            <td><strong>C1:</strong> Dadas reservas confirmadas, calcula ahorro (15 - aporte). <strong>C2:</strong> Sin viajes muestra S/ 0.00 ahorrados.</td>
+            <td><strong>3 pts</strong> — Mayor que H-01 por agregación estadística.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sticky-grid">
+      <div class="sticky pink">
+        <span class="ev-badge">Evidencia 9 · Decisión sobre Funciones de los Fundadores</span>
+        <h4>DESCARTADAS DEL MVP CON EVIDENCIA:</h4>
+        <p>1. <strong>Mapa en tiempo real:</strong> Descartado. María y Valeria no quieren desviarse a calles internas; el Paradero Fijo Troncal resolvió el 90% de puntualidad en el experimento.</p>
+        <p>2. <strong>Pagos integrados:</strong> Descartado. El 100% pagó directo (Yape/efectivo) en 10 s al subir; lo urgente era conocer el aporte de antemano.</p>
+        <p>3. <strong>Reconocimiento facial:</strong> Descartado. El dominio institucional <code>@tecsup.edu.pe</code> resuelve la seguridad dentro de la comunidad universitaria sin arriesgar datos biométricos.</p>
+      </div>
+      <div class="sticky green">
+        <span class="ev-badge">Evidencia 11 · Definition of Done (DoD) Única</span>
+        <h4>Aplicable a todas las historias:</h4>
+        <p>1. Desarrollada en rama propia <code>feature/H-XX-...</code> con commits que citan <code>H-XX</code>.<br/>
+        2. 100% de sus criterios de aceptación (Dado/Cuando/Entonces) verificados con pruebas.<br/>
+        3. Datos persistentes y 100% ficticios (sin secretos expuestos).<br/>
+        4. Integrada a la rama <code>main</code>.<br/>
+        5. <strong>Desplegada y verificada en línea</strong> desde URL pública con HTTPS en ventana de incógnito.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARCO 4 -->
+  <section id="parte4" class="miro-frame">
+    <div class="frame-title-bar">
+      <span class="frame-title">Parte 4 — Construcción y Despliegue</span>
+      <span>Evidencias 12, 13, 14, 15 y 16</span>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 12 · Sprint Backlog (Sprint Goal, Tareas en Horas y Capacidad Real = 15.0 h)</span>
+      <p style="margin-bottom:10px;"><strong>Sprint Goal:</strong> Entregar en línea el MVP funcional de EcoRuta con acceso <code>@tecsup.edu.pe</code>, publicación con paradero fijo, búsqueda por corredor/horario, reserva con bloqueo en 0 cupos, cancelación y manifiesto de viaje. <strong>Capacidad Real:</strong> 15.0 h (5 días &times; 3 h/día). <strong>Planificado:</strong> 14.5 h.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Historia</th>
+            <th>Tareas en Horas</th>
+            <th>Total Horas</th>
+            <th>Estado Kanban</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>H-01</strong> (2 pts)</td>
+            <td>T1.1 Persistencia de usuarios ficticios (1.0 h) + T1.2 API y UI Login institucional <code>@tecsup.edu.pe</code> (1.5 h)</td>
+            <td><strong>2.5 h</strong></td>
+            <td><span class="ok-tag">DONE</span></td>
+          </tr>
+          <tr>
+            <td><strong>H-02</strong> (3 pts)</td>
+            <td>T2.1 API POST <code>/api/routes</code> con validación 1-4 asientos (1.5 h) + T2.2 Formulario paradero fijo (1.0 h)</td>
+            <td><strong>2.5 h</strong></td>
+            <td><span class="ok-tag">DONE</span></td>
+          </tr>
+          <tr>
+            <td><strong>H-03</strong> (2 pts)</td>
+            <td>T3.1 Filtro backend por zona/turno/cupos (1.0 h) + T3.2 Barra de búsqueda y tarjetas (1.5 h)</td>
+            <td><strong>2.5 h</strong></td>
+            <td><span class="ok-tag">DONE</span></td>
+          </tr>
+          <tr>
+            <td><strong>H-04</strong> (5 pts)</td>
+            <td>T4.1 Descuento atómico de asientos y paso a Completa en 0 (2.0 h) + T4.2 UI de reserva y bloqueo 409 (1.5 h)</td>
+            <td><strong>3.5 h</strong></td>
+            <td><span class="ok-tag">DONE</span></td>
+          </tr>
+          <tr>
+            <td><strong>H-05</strong> (3 pts)</td>
+            <td>T5.1 API DELETE reserva con incremento +1 cupo (1.0 h) + T5.2 UI de cancelación inmediata (1.0 h)</td>
+            <td><strong>2.0 h</strong></td>
+            <td><span class="ok-tag">DONE</span></td>
+          </tr>
+          <tr>
+            <td><strong>H-06</strong> (2 pts)</td>
+            <td>T6.1 Manifiesto de pasajeros y viajes + suite <code>acceptance.test.js</code> y tag <code>v1.0.0</code> (1.5 h)</td>
+            <td><strong>1.5 h</strong></td>
+            <td><span class="ok-tag">DONE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 14 · Burndown Chart (Línea Ideal vs. Real) y Registro de 5 Días con Impedimento Real</span>
+      <div style="display:grid; grid-template-columns: 1fr 1.3fr; gap: 18px; align-items: start;">
+        <div>
+          <svg viewBox="0 0 420 240" style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:8px;">
+            <text x="15" y="20" font-size="12" font-weight="bold" fill="#0f172a">Burndown Chart (14.5 h en 5 Días)</text>
+            <line x1="40" y1="35" x2="40" y2="200" stroke="#94a3b8" stroke-width="1.5"/>
+            <line x1="40" y1="200" x2="390" y2="200" stroke="#94a3b8" stroke-width="1.5"/>
+            <!-- Línea Ideal (Azul punteada) -->
+            <polyline fill="none" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="5,5"
+              points="40,40 110,72 180,104 250,136 320,168 390,200" />
+            <!-- Línea Real (Verde sólida) -->
+            <polyline fill="none" stroke="#0f764a" stroke-width="3"
+              points="40,40 110,68 180,106 250,128 320,183 390,200" />
+            <circle cx="250" cy="128" r="5" fill="#dc2626" />
+            <text x="200" y="118" font-size="9" fill="#dc2626" font-weight="bold">Impedimento Día 3 (6.5h)</text>
+            <text x="40" y="218" font-size="10">D0</text>
+            <text x="105" y="218" font-size="10">D1</text>
+            <text x="175" y="218" font-size="10">D2</text>
+            <text x="245" y="218" font-size="10">D3</text>
+            <text x="315" y="218" font-size="10">D4</text>
+            <text x="380" y="218" font-size="10">D5</text>
+            <text x="55" y="234" font-size="10" fill="#2563eb">--- Línea Ideal</text>
+            <text x="165" y="234" font-size="10" fill="#0f764a">─── Línea Real</text>
+          </svg>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Día</th>
+              <th>Ideal</th>
+              <th>Real</th>
+              <th>Qué hice / Qué haré / Impedimento Real</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Día 1</strong></td>
+              <td>11.6 h</td>
+              <td>12.0 h</td>
+              <td>Completé <code>H-01</code> (Login <code>@tecsup.edu.pe</code>). Mañana: <code>H-02</code>. Sin bloqueos.</td>
+            </tr>
+            <tr>
+              <td><strong>Día 2</strong></td>
+              <td>8.7 h</td>
+              <td>8.5 h</td>
+              <td>Completé <code>H-02</code> y API de <code>H-03</code>. Mañana: UI <code>H-03</code> y <code>H-04</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Día 3</strong></td>
+              <td>5.8 h</td>
+              <td>6.5 h</td>
+              <td><strong>IMPEDIMENTO REAL:</strong> Al reservar el último asiento en <code>H-04</code> o en entorno serverless de solo lectura, la persistencia fallaba o permitía doble clic.</td>
+            </tr>
+            <tr>
+              <td><strong>Día 4</strong></td>
+              <td>2.9 h</td>
+              <td>1.5 h</td>
+              <td><strong>Solución al impedimento:</strong> Persistencia con fallback automático a directorio escribible <code>os.tmpdir()</code> + bloqueo atómico <code>409</code> en 0 cupos. Cerré <code>H-04</code> y <code>H-05</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Día 5</strong></td>
+              <td>0.0 h</td>
+              <td>0.0 h</td>
+              <td>Completé <code>H-06</code>, suite de pruebas Gherkin, tag <code>v1.0.0</code> y despliegue HTTPS.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sticky-grid">
+      <div class="sticky yellow">
+        <span class="ev-badge">Evidencia 16 · Registro de Cambios del Backlog</span>
+        <h4>Control de Alcance durante la Construcción:</h4>
+        <p>Se mantuvieron las 6 historias del MVP (<code>H-01</code> a <code>H-06</code>) sin recortes. Se añadió un refinamiento de usabilidad en <code>H-01</code>: <strong>botones de autocompletado de credenciales en 1 clic y barra de cambio rápido de usuario</strong> para facilitar la prueba en ventana de incógnito.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARCO 5 -->
+  <section id="parte5" class="miro-frame">
+    <div class="frame-title-bar">
+      <span class="frame-title">Parte 5 — Cierre</span>
+      <span>Evidencias 17, 18, 19 y 20</span>
+    </div>
+
+    <div class="sub-block">
+      <span class="ev-badge">Evidencia 17 · Matriz Completa del Hilo Conductor (100 % Criterios Cumplidos en Línea)</span>
+      <table>
+        <thead>
+          <tr>
+            <th>Cita</th>
+            <th>Oportunidad</th>
+            <th>Necesidad</th>
+            <th>Épica</th>
+            <th>Historia</th>
+            <th>Criterio de Aceptación</th>
+            <th>Commit</th>
+            <th>Evidencia en Línea</th>
+            <th>¿Cumple?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>María (Caso) + E-01</td>
+            <td>OP-1: Seguridad y ruta troncal</td>
+            <td>N1: Comunidad verificada</td>
+            <td>EP-01</td>
+            <td><strong>H-01</strong></td>
+            <td>CA-1.1: Permite acceso a correo <code>@tecsup.edu.pe</code></td>
+            <td><code>86b5453</code> (H-01)</td>
+            <td>Login en 1 clic con Jorge o María muestra insignia verificada</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>María (Caso)</td>
+            <td>OP-1: Evitar desconocidos</td>
+            <td>N1: Bloqueo de externos</td>
+            <td>EP-01</td>
+            <td><strong>H-01</strong></td>
+            <td>CA-1.2: Rechaza correo <code>@gmail.com</code> con 403</td>
+            <td><code>86b5453</code> (H-01)</td>
+            <td>Botón "Probar Rechazo Externo" muestra bloqueo institucional</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>María (Caso) + E-01</td>
+            <td>OP-1: No dar vueltas</td>
+            <td>N1: Paradero fijo único</td>
+            <td>EP-02</td>
+            <td><strong>H-02</strong></td>
+            <td>CA-2.1: Conductor publica ruta con paradero fijo y 1-4 cupos</td>
+            <td><code>18ba852</code> (H-02)</td>
+            <td>Pestaña 2 con rol Conductor crea ruta activa al instante</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>Luis (Caso)</td>
+            <td>OP-2: Límite real de auto</td>
+            <td>N2: Validar 1 a 4 asientos</td>
+            <td>EP-02</td>
+            <td><strong>H-02</strong></td>
+            <td>CA-2.2: Impide publicar fuera de 1-4 cupos o con rol Pasajero</td>
+            <td><code>18ba852</code> (H-02)</td>
+            <td>Validación activa en formulario y API</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>Jorge (Caso) + E-02</td>
+            <td>OP-3: Encontrar misma ruta</td>
+            <td>N3: Buscar por corredor y hora</td>
+            <td>EP-03</td>
+            <td><strong>H-03</strong></td>
+            <td>CA-3.1: Filtra rutas por zona (San Miguel/Javier Prado) y hora</td>
+            <td><code>09bbed1</code> (H-03)</td>
+            <td>Selector de zona y horario en Pestaña 1 filtra en vivo</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>Ana (Caso)</td>
+            <td>OP-3: Llegar a tiempo</td>
+            <td>N3: Ver solo cupos libres</td>
+            <td>EP-03</td>
+            <td><strong>H-03</strong></td>
+            <td>CA-3.2: Check "Solo asientos libres" oculta rutas completas</td>
+            <td><code>09bbed1</code> (H-03)</td>
+            <td>Al activar check se oculta la ruta llena de Los Olivos</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>Luis (Caso) + E-03</td>
+            <td>OP-2: Evitar caos de chat</td>
+            <td>N2: Reserva instantánea</td>
+            <td>EP-04</td>
+            <td><strong>H-04</strong></td>
+            <td>CA-4.1: Reserva resta 1 asiento y al llegar a 0 marca Completa</td>
+            <td><code>e7201d9</code> (H-04)</td>
+            <td>Botón "Reservar Asiento" descuenta cupo y actualiza estado</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>Luis (Caso)</td>
+            <td>OP-2: Cero sobrecupo</td>
+            <td>N2: Bloqueo en 0 asientos</td>
+            <td>EP-04</td>
+            <td><strong>H-04</strong></td>
+            <td>CA-4.2: Ruta con 0 asientos impide nuevas reservas (409)</td>
+            <td><code>e7201d9</code> (H-04)</td>
+            <td>Tarjeta Completa tiene botón bloqueado y API rechaza sobrecupo</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>Camila (E-03)</td>
+            <td>OP-2: Imprevistos de horario</td>
+            <td>N2: Liberar asiento al cancelar</td>
+            <td>EP-04</td>
+            <td><strong>H-05</strong></td>
+            <td>CA-5.1: Cancelar reserva suma +1 asiento disponible</td>
+            <td><code>d19ea8d</code> (H-05)</td>
+            <td>Pestaña 3 botón "Cancelar Reserva" incrementa cupo libre</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>Camila (E-03)</td>
+            <td>OP-2: Reabrir cupo libre</td>
+            <td>N2: Reactivar ruta completa</td>
+            <td>EP-04</td>
+            <td><strong>H-05</strong></td>
+            <td>CA-5.2: Cancelar en ruta Completa la devuelve a "Activa"</td>
+            <td><code>d19ea8d</code> (H-05)</td>
+            <td>Al cancelar en ruta llena vuelve a estar disponible</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>María y Luis</td>
+            <td>OP-1 y OP-2</td>
+            <td>N1 y N2: Nómina cerrada</td>
+            <td>EP-04</td>
+            <td><strong>H-06</strong></td>
+            <td>CA-6.1: Conductor visualiza lista de pasajeros confirmados</td>
+            <td><code>fb1861d</code> (H-06)</td>
+            <td>Pestaña 3 muestra nombre y correo de cada pasajero inscrito</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+          <tr>
+            <td>Jorge y Ana</td>
+            <td>OP-3: Certidumbre de viaje</td>
+            <td>N3: Datos de abordaje</td>
+            <td>EP-04</td>
+            <td><strong>H-06</strong></td>
+            <td>CA-6.2: Pasajero visualiza vehículo, hora, aporte y paradero</td>
+            <td><code>fb1861d</code> (H-06)</td>
+            <td>Pestaña 3 muestra resumen completo del viaje reservado</td>
+            <td><span class="ok-tag">SÍ</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sticky-grid">
+      <div class="sticky blue">
+        <span class="ev-badge">Evidencia 18 · Sprint Review con 2 Personas Externas</span>
+        <h4>Participantes: Sebastián Alarcón (Conductor) y Lucía Fernández (Pasajera)</h4>
+        <p><strong>Terminado:</strong> 100% (<code>H-01</code> a <code>H-06</code>). <strong>No terminado:</strong> Ninguna.</p>
+        <p style="margin-top:6px;"><strong>Observación 1 (Sebastián):</strong> Pedir botón para duplicar ruta diaria sin reescribir paradero &rarr; <em>Efecto: Se prioriza <code>H-08</code> al tope del Sprint 2.</em></p>
+        <p><strong>Observación 2 (Lucía):</strong> Destacar minutos de tolerancia máxima en el paradero &rarr; <em>Efecto: Se refina <code>H-09</code> con campo de tolerancia (5 min).</em></p>
+        <p style="margin-top:6px;"><strong>Outcome inicial vs. aprendido:</strong> La puntualidad y adopción dependen de la claridad del paradero fijo y el bloqueo de cupos, no de mapas GPS en vivo.</p>
+      </div>
+
+      <div class="sticky purple">
+        <span class="ev-badge">Evidencia 19 · Retrospectiva del Sprint</span>
+        <h4>Qué salió bien, qué no y 2 mejoras concretas</h4>
+        <p><strong>Salió bien:</strong> Descartar funciones sin evidencia (GPS/pagos/biometría) y usar ramas por historia con pruebas Gherkin.</p>
+        <p><strong>No salió bien:</strong> Retraso de 0.7 h en Día 3 por persistencia en entorno serverless y reservas simultáneas en el último asiento.</p>
+        <p style="margin-top:6px;"><strong>Mejora Concreta 1:</strong> Redactar y correr las pruebas automatizadas de casos borde (0 cupos) antes de programar la UI (ATDD).</p>
+        <p><strong>Mejora Concreta 2:</strong> Incluir desde el Día 1 botones de cambio rápido de rol y restauración de datos semilla.</p>
+      </div>
+
+      <div class="sticky green">
+        <span class="ev-badge">Evidencia 20 · Registro del Lanzamiento</span>
+        <h4>Lanzamiento Oficial v1.0.0</h4>
+        <p><strong>Entorno:</strong> Producción web con HTTPS activo y persistencia verificada.</p>
+        <p><strong>Verificación final:</strong> Comprobado en ventana de incógnito completando el flujo de principio a fin solo con las credenciales de prueba publicadas.</p>
+        <p><strong>Comunicado a:</strong> Docente Edwin Córdova B. (Canvas Tecsup) y a los 5 estudiantes participantes del Discovery y Sprint Review.</p>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
