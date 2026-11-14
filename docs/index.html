@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoRuta Tecsup — MVP Carpooling Estudiantil Verificado</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <span class="brand-badge">ECORUTA · v1.0.0</span>
+        <h1>EcoRuta <span>Tecsup</span></h1>
+        <p class="subtitle">Comunidad verificada de rutas compartidas con paraderos fijos y cupos exactos</p>
+      </div>
+      <div class="session-controls" style="display:flex; gap:10px; align-items:center;">
+        <a href="./miro.html" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none; background:#18a567;">
+          📋 Ver Tablero de Evidencias (1 a 20)
+        </a>
+        <div id="userBadge" class="user-badge hidden">
+          <span class="verified-pill">✓ Verificado @tecsup.edu.pe</span>
+          <strong id="currentUserName"></strong>
+          <span id="currentUserRole" class="role-tag"></span>
+          <button id="btnLogout" class="btn btn-outline btn-sm">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-layout">
+    <!-- Banner de Aviso de Datos Ficticios (Requisito de Evaluación) -->
+    <section class="notice-banner" aria-label="Aviso de Evaluación">
+      <div>
+        <strong>Modo Evaluación en Línea (Datos 100% Ficticios):</strong>
+        Todos los perfiles, vehículos, paraderos y viajes son ficticios para validar el 100% de los criterios de aceptación (H-01 a H-06). Los datos persisten tras recargar o reiniciar.
+      </div>
+      <button id="btnResetDemo" class="btn btn-secondary btn-sm" title="Restaurar estado inicial de demostración">
+        Restaurar Datos Iniciales
+      </button>
+    </section>
+
+    <!-- SECCIÓN DE LOGIN / CREDENCIALES DE PRUEBA (H-01) -->
+    <section id="authSection" class="card auth-card">
+      <div class="auth-grid">
+        <div>
+          <span class="section-tag">Historia H-01 · Comunidad Segura</span>
+          <h2>Ingreso Exclusivo con Correo Institucional</h2>
+          <p class="muted">
+            Para resolver la desconfianza de coordinar con desconocidos (Cita de María y Entrevista E-01), EcoRuta valida que todo participante pertenezca al dominio <code>@tecsup.edu.pe</code>.
+          </p>
+
+          <form id="loginForm" class="form-stack">
+            <div class="form-group">
+              <label for="loginEmail">Correo Institucional</label>
+              <input
+                type="email"
+                id="loginEmail"
+                placeholder="ejemplo@tecsup.edu.pe"
+                required
+                 value="jorge.mendoza@tecsup.edu.pe"
+              />
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Contraseña</label>
+              <input
+                type="password"
+                id="loginPassword"
+                placeholder="Contraseña"
+                required
+                value="Password123!"
+              />
+            </div>
+            <div id="loginFeedback" class="feedback hidden"></div>
+            <div class="form-actions">
+              <button type="submit" id="btnLoginSubmit" class="btn btn-primary">
+                Ingresar a EcoRuta
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="credentials-panel">
+          <h3>Credenciales de Prueba (1 Clic para autocompletar)</h3>
+          <p class="small-text">Haz clic en cualquier usuario de prueba para cargar sus credenciales y probar cada rol en ventana de incógnito:</p>
+
+          <div class="cred-list">
+            <button type="button" class="cred-item" data-email="jorge.mendoza@tecsup.edu.pe" data-pass="Password123!">
+              <div class="cred-header">
+                <strong>Jorge Mendoza (Ficticio)</strong>
+                <span class="role-tag pasajero">Rol: Pasajero</span>
+              </div>
+              <code>jorge.mendoza@tecsup.edu.pe</code> · Clave: <code>Password123!</code>
+              <span class="cred-desc">Ideal para buscar rutas (H-03), reservar asiento (H-04) y cancelar (H-05).</span>
+            </button>
+
+            <button type="button" class="cred-item" data-email="maria.quispe@tecsup.edu.pe" data-pass="Password123!">
+              <div class="cred-header">
+                <strong>María Quispe (Ficticio)</strong>
+                <span class="role-tag conductor">Rol: Conductor</span>
+              </div>
+              <code>maria.quispe@tecsup.edu.pe</code> · Clave: <code>Password123!</code>
+              <span class="cred-desc">Ideal para publicar ruta con paradero fijo (H-02) y ver pasajeros confirmados (H-06).</span>
+            </button>
+
+            <button type="button" class="cred-item" data-email="ana.torres@tecsup.edu.pe" data-pass="Password123!">
+              <div class="cred-header">
+                <strong>Ana Torres (Ficticio)</strong>
+                <span class="role-tag pasajero">Rol: Pasajero</span>
+              </div>
+              <code>ana.torres@tecsup.edu.pe</code> · Clave: <code>Password123!</code>
+              <span class="cred-desc">Turno noche (trabaja y estudia) — busca puntualidad de llegada a las 18:45.</span>
+            </button>
+
+            <button type="button" class="cred-item" data-email="luis.paredes@tecsup.edu.pe" data-pass="Password123!">
+              <div class="cred-header">
+                <strong>Luis Paredes (Ficticio)</strong>
+                <span class="role-tag conductor">Rol: Conductor</span>
+              </div>
+              <code>luis.paredes@tecsup.edu.pe</code> · Clave: <code>Password123!</code>
+              <span class="cred-desc">Conductor con cupos controlados (evita el caos de 10 mensajes en WhatsApp).</span>
+            </button>
+
+            <button type="button" class="cred-item cred-invalid" data-email="externo.desconocido@gmail.com" data-pass="Password123!">
+              <div class="cred-header">
+                <strong>Probar Rechazo de Correo Externo (Criterio 2 de H-01)</strong>
+                <span class="role-tag danger">Prueba Negativa</span>
+              </div>
+              <code>externo.desconocido@gmail.com</code>
+              <span class="cred-desc">Verifica que el sistema bloquea correos fuera de @tecsup.edu.pe.</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL PRINCIPAL DE LA APLICACIÓN (VISIBLE TRAS INICIAR SESIÓN) -->
+    <div id="appWorkspace" class="workspace hidden">
+      <!-- Barra rápida de cambio de rol / usuario para facilitar revisión del docente -->
+      <div class="quick-switch-bar">
+        <span>Cambiar rápido de usuario de prueba:</span>
+        <button type="button" class="btn btn-xs" data-quick-email="jorge.mendoza@tecsup.edu.pe">Pasajero: Jorge</button>
+        <button type="button" class="btn btn-xs" data-quick-email="ana.torres@tecsup.edu.pe">Pasajero: Ana</button>
+        <button type="button" class="btn btn-xs" data-quick-email="maria.quispe@tecsup.edu.pe">Conductor: María</button>
+        <button type="button" class="btn btn-xs" data-quick-email="luis.paredes@tecsup.edu.pe">Conductor: Luis</button>
+      </div>
+
+      <!-- Pestañas de navegación del MVP -->
+      <nav class="tabs-nav" aria-label="Secciones del MVP">
+        <button type="button" class="tab-btn active" data-tab="tabExplore">
+          1. Buscar y Reservar Rutas (H-03, H-04)
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabPublish" id="tabPublishBtn">
+          2. Publicar Ruta con Paradero Fijo (H-02)
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabMyTrips">
+          3. Mis Viajes, Manifiesto y Cancelaciones (H-05, H-06)
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabTraceability">
+          4. Hilo Conductor y Criterios del MVP (Evidencias)
+        </button>
+      </nav>
+
+      <div id="globalToast" class="feedback hidden"></div>
+
+      <!-- TAB 1: BUSCAR Y RESERVAR RUTAS (H-03 y H-04) -->
+      <section id="tabExplore" class="tab-panel active">
+        <div class="card filter-card">
+          <div class="card-header-row">
+            <div>
+              <span class="section-tag">Historia H-03 · Búsqueda por Corredor y Horario</span>
+              <h2>Rutas Estudiantiles Hacia Campus Tecsup Santa Anita</h2>
+            </div>
+          </div>
+
+          <form id="filterForm" class="filter-bar">
+            <div class="form-group">
+              <label for="filterZone">Zona o Corredor Vial</label>
+              <select id="filterZone">
+                <option value="">Todas las zonas (San Miguel, Javier Prado, Los Olivos...)</option>
+                <option value="San Miguel">San Miguel / Universitaria</option>
+                <option value="Javier Prado">Javier Prado / Centro Cívico / La Rambla</option>
+                <option value="Los Olivos">Los Olivos / MegaPlaza / Evitamiento</option>
+                <option value="Surco">Surco / Puente Primavera</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="filterTime">Turno / Hora de Salida</label>
+              <select id="filterTime">
+                <option value="">Todos los horarios</option>
+                <option value="06:">Mañana Temprano (06:00 - 06:59)</option>
+                <option value="07:">Mañana (07:00 - 07:59)</option>
+                <option value="18:">Noche / Salida de Trabajo (18:00 - 18:59)</option>
+              </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="filterOnlyAvailable" />
+                Solo rutas con asientos libres (&gt; 0)
+              </label>
+            </div>
+
+            <div class="filter-actions">
+              <button type="submit" class="btn btn-primary btn-sm">Filtrar Rutas</button>
+              <button type="button" id="btnClearFilters" class="btn btn-outline btn-sm">Ver Todas</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="routesList" class="routes-grid"></div>
+      </section>
+
+      <!-- TAB 2: PUBLICAR RUTA (H-02) -->
+      <section id="tabPublish" class="tab-panel hidden">
+        <div class="card">
+          <span class="section-tag">Historia H-02 · Publicación con Paradero Fijo y Cupos Exactos</span>
+          <h2>Publicar Nueva Ruta hacia Campus Tecsup</h2>
+          <p class="muted">
+            Evita dar vueltas innecesarias (dolor de María) y evita que 10 personas escriban a la vez por WhatsApp (dolor de Luis) definiendo un único paradero fijo en tu avenida principal y un límite estricto de asientos (1 a 4).
+          </p>
+
+          <div id="driverOnlyNotice" class="feedback warning hidden">
+            Estás conectado con rol <strong>Pasajero</strong>. Para publicar una ruta, cambia arriba en 1 clic a <strong>Conductor: María</strong> o <strong>Conductor: Luis</strong>.
+          </div>
+
+          <form id="publishRouteForm" class="form-grid">
+            <div class="form-group">
+              <label for="routeOriginZone">Zona / Corredor de Origen *</label>
+              <input
+                type="text"
+                id="routeOriginZone"
+                placeholder="Ej. San Miguel / Av. La Marina"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="routeFixedStop">Paradero Fijo de Encuentro (Sin desvíos) *</label>
+              <input
+                type="text"
+                id="routeFixedStop"
+                placeholder="Ej. Paradero Plaza San Miguel (Cruce La Marina con Universitaria)"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="routeDepartureTime">Hora Exacta de Partida *</label>
+              <input type="time" id="routeDepartureTime" value="07:15" required />
+            </div>
+
+            <div class="form-group">
+              <label for="routeArrivalTime">Hora Estimada de Llegada a Tecsup *</label>
+              <input type="time" id="routeArrivalTime" value="07:55" required />
+            </div>
+
+            <div class="form-group">
+              <label for="routeSeats">Asientos Disponibles (1 a 4) *</label>
+              <input
+                type="number"
+                id="routeSeats"
+                min="1"
+                max="4"
+                value="3"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="routeContribution">Aporte de Gasto Compartido (S/ 0 a S/ 15) *</label>
+              <input
+                type="number"
+                id="routeContribution"
+                min="0"
+                max="15"
+                step="0.5"
+                value="6.00"
+                required
+              />
+            </div>
+
+            <div class="form-group full-width">
+              <label for="routeNotes">Indicaciones de Puntualidad y Referencia del Vehículo</label>
+              <input
+                type="text"
+                id="routeNotes"
+                placeholder="Ej. Tolerancia máxima 5 minutos en el paradero fijo. Pago directo por Yape/Efectivo al subir."
+              />
+            </div>
+
+            <div class="form-actions full-width">
+              <button type="submit" id="btnPublishSubmit" class="btn btn-primary">
+                Publicar Ruta Verificada
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB 3: MIS VIAJES, MANIFIESTO Y CANCELACIONES (H-05 y H-06) -->
+      <section id="tabMyTrips" class="tab-panel hidden">
+        <div class="trips-columns">
+          <div class="card">
+            <span class="section-tag">Historia H-05 y H-06 · Vista de Pasajero</span>
+            <h3>Mis Asientos Reservados</h3>
+            <p class="muted">Revisa el paradero fijo acordado o cancela con anticipación para liberar el asiento automáticamente.</p>
+            <div id="myPassengerReservations" class="stack-list"></div>
+          </div>
+
+          <div class="card">
+            <span class="section-tag">Historia H-06 · Manifiesto del Conductor</span>
+            <h3>Mis Rutas Publicadas y Pasajeros Confirmados</h3>
+            <p class="muted">Lista cerrada de estudiantes verificados que abordarán en tu paradero fijo.</p>
+            <div id="myDriverRoutes" class="stack-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: MATRIZ DE HILO CONDUCTOR EN LÍNEA -->
+      <section id="tabTraceability" class="tab-panel hidden">
+        <div class="card">
+          <span class="section-tag">Evidencia 15 y 17 · Verificación Interactiva en Línea</span>
+          <h2>Matriz del Hilo Conductor (Del Discovery al Código Desplegado)</h2>
+          <p class="muted">
+            Cada función construida en este MVP responde directamente a una cita del Discovery y a un criterio de aceptación verificable en línea.
+          </p>
+          <div class="table-responsive">
+            <table class="trace-table">
+              <thead>
+                <tr>
+                  <th>Historia</th>
+                  <th>Cita / Evidencia Discovery</th>
+                  <th>Oportunidad y Necesidad</th>
+                  <th>Criterio de Aceptación (Gherkin)</th>
+                  <th>Estado en Línea</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>H-01</strong><br/>Acceso @tecsup.edu.pe</td>
+                  <td>María: <em>"No sé cómo coordinar con desconocidos de forma segura"</em> + E-01 (Valeria)</td>
+                  <td>Necesidad de saber que el compañero de viaje es un estudiante real de Tecsup.</td>
+                  <td>Dado un correo institucional @tecsup.edu.pe ingresa al sistema; si usa otro dominio (@gmail.com) se rechaza con mensaje claro.</td>
+                  <td><span class="status-pill ok">✓ Cumple 100%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>H-02</strong><br/>Publicar ruta con paradero fijo</td>
+                  <td>María: <em>"...sin que se me haga tarde por dar muchas vueltas"</em> + Luis: <em>"10 personas a la vez, fue un caos"</em></td>
+                  <td>Publicar ruta indicando paradero fijo único, hora exacta, aporte y cupos (1 a 4).</td>
+                  <td>Dado un conductor autenticado, cuando publica ruta con 1-4 asientos y paradero fijo, queda activa en la cartelera.</td>
+                  <td><span class="status-pill ok">✓ Cumple 100%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>H-03</strong><br/>Buscar por zona y horario</td>
+                  <td>Jorge: <em>"No conozco a nadie que haga mi misma ruta"</em> + Ana: <em>"llego corriendo a mi clase de 6:50pm"</em></td>
+                  <td>Encontrar rutas compatibles por corredor vial y hora estimada de llegada.</td>
+                  <td>Dado el listado de rutas, cuando filtra por zona o turno, muestra solo rutas coincidentes con su aporte y hora de llegada.</td>
+                  <td><span class="status-pill ok">✓ Cumple 100%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>H-04</strong><br/>Reserva con bloqueo de sobrecupo</td>
+                  <td>Luis: <em>"Me escribieron 10 personas a la vez. Fue un caos organizar quién iba al final"</em></td>
+                  <td>Asegurar asiento instantáneamente y cerrar la ruta al llegar a 0 cupos.</td>
+                  <td>Dado cupo &gt; 0, al reservar descuenta 1 asiento; cuando llega a 0 cambia a "Completa" e impide nuevas reservas.</td>
+                  <td><span class="status-pill ok">✓ Cumple 100%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>H-05</strong><br/>Cancelación y liberación de cupo</td>
+                  <td>Entrevista E-02 (Diego) y E-03 (Camila): imprevistos de horario requieren liberar el asiento a tiempo.</td>
+                  <td>Cancelar reserva confirmada para no perjudicar al conductor ni a otros compañeros.</td>
+                  <td>Dada una reserva confirmada, cuando el pasajero la cancela, el asiento disponible aumenta en +1 y la ruta vuelve a "Activa".</td>
+                  <td><span class="status-pill ok">✓ Cumple 100%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>H-06</strong><br/>Manifiesto de viaje y punto de encuentro</td>
+                  <td>María y Ana: necesidad de puntualidad y claridad sobre quiénes abordan en el paradero fijo.</td>
+                  <td>Visualizar lista nominal de pasajeros confirmados y punto exacto de abordaje.</td>
+                  <td>Dado un viaje con reservas, el conductor ve la nómina de pasajeros @tecsup.edu.pe y el pasajero ve los datos del vehículo y paradero.</td>
+                  <td><span class="status-pill ok">✓ Cumple 100%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span><strong>EcoRuta Tecsup MVP v1.0.0</strong> · Construcción y Pruebas de Software (4to Ciclo)</span>
+      <span>Datos 100% ficticios · Persistencia activa · Sin mapas en vivo, pasarelas ni biometría innecesaria (Evidencia 9)</span>
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

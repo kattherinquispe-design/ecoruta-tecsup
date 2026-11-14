@@ -27,13 +27,345 @@ function showToast(message, type = 'success') {
   }, 6000);
 }
 
+const INITIAL_DEMO_DATA = {
+  users: [
+    {
+      id: "usr-01",
+      email: "maria.quispe@tecsup.edu.pe",
+      password: "Password123!",
+      name: "María Quispe (Ficticio)",
+      role: "conductor",
+      career: "Diseño y Desarrollo de Software - 4to Ciclo",
+      code: "20241045",
+      vehicle: "Toyota Yaris Gris (Placa Ficticia ABC-123)",
+      rating: 4.9,
+      verifiedInstitutional: true
+    },
+    {
+      id: "usr-02",
+      email: "luis.paredes@tecsup.edu.pe",
+      password: "Password123!",
+      name: "Luis Paredes (Ficticio)",
+      role: "conductor",
+      career: "Administración de Redes y Comunicaciones - 4to Ciclo",
+      code: "20241088",
+      vehicle: "Kia Picanto Azul (Placa Ficticia T3C-504)",
+      rating: 4.8,
+      verifiedInstitutional: true
+    },
+    {
+      id: "usr-03",
+      email: "jorge.mendoza@tecsup.edu.pe",
+      password: "Password123!",
+      name: "Jorge Mendoza (Ficticio)",
+      role: "pasajero",
+      career: "Diseño y Desarrollo de Software - 4to Ciclo",
+      code: "20241102",
+      vehicle: null,
+      rating: 5.0,
+      verifiedInstitutional: true
+    },
+    {
+      id: "usr-04",
+      email: "ana.torres@tecsup.edu.pe",
+      password: "Password123!",
+      name: "Ana Torres (Ficticio)",
+      role: "pasajero",
+      career: "Mecatrónica Industrial - 4to Ciclo",
+      code: "20241159",
+      vehicle: null,
+      rating: 4.9,
+      verifiedInstitutional: true
+    }
+  ],
+  routes: [
+    {
+      id: "ruta-101",
+      driverId: "usr-01",
+      driverName: "María Quispe (Ficticio)",
+      driverCareer: "Diseño y Desarrollo de Software - 4to Ciclo",
+      driverVehicle: "Toyota Yaris Gris (Placa Ficticia ABC-123)",
+      originZone: "San Miguel",
+      destination: "Campus Tecsup Santa Anita",
+      departureTime: "07:10",
+      estimatedArrival: "07:50",
+      fixedStop: "Cruce Av. La Marina con Av. Universitaria (Paradero Plaza San Miguel)",
+      contributionSoles: 6.00,
+      totalSeats: 3,
+      availableSeats: 2,
+      status: "Activa",
+      notes: "Salgo puntual 7:10 am. Ruta directa por Evitamiento sin desvíos.",
+      createdAt: "2026-11-10T12:00:00Z"
+    },
+    {
+      id: "ruta-102",
+      driverId: "usr-02",
+      driverName: "Luis Paredes (Ficticio)",
+      driverCareer: "Administración de Redes y Comunicaciones - 4to Ciclo",
+      driverVehicle: "Kia Picanto Azul (Placa Ficticia T3C-504)",
+      originZone: "Javier Prado / Centro Cívico",
+      destination: "Campus Tecsup Santa Anita",
+      departureTime: "18:10",
+      estimatedArrival: "18:45",
+      fixedStop: "Paradero puente peatonal La Rambla San Borja (Av. Javier Prado Este)",
+      contributionSoles: 5.00,
+      totalSeats: 3,
+      availableSeats: 1,
+      status: "Activa",
+      notes: "Ideal para turno noche (clases de 18:50). Salida exacta 18:10.",
+      createdAt: "2026-11-10T13:30:00Z"
+    },
+    {
+      id: "ruta-103",
+      driverId: "usr-01",
+      driverName: "María Quispe (Ficticio)",
+      driverCareer: "Diseño y Desarrollo de Software - 4to Ciclo",
+      driverVehicle: "Toyota Yaris Gris (Placa Ficticia ABC-123)",
+      originZone: "Los Olivos / MegaPlaza",
+      destination: "Campus Tecsup Santa Anita",
+      departureTime: "06:50",
+      estimatedArrival: "07:35",
+      fixedStop: "Puente Peatonal MegaPlaza (Panamericana Norte -> Evitamiento)",
+      contributionSoles: 6.50,
+      totalSeats: 2,
+      availableSeats: 0,
+      status: "Completa",
+      notes: "Viaje directo por Vía de Evitamiento hasta Puente Santa Anita.",
+      createdAt: "2026-11-11T09:00:00Z"
+    }
+  ],
+  reservations: [
+    {
+      id: "res-501",
+      routeId: "ruta-101",
+      passengerId: "usr-03",
+      passengerName: "Jorge Mendoza (Ficticio)",
+      passengerEmail: "jorge.mendoza@tecsup.edu.pe",
+      passengerCareer: "Diseño y Desarrollo de Software - 4to Ciclo",
+      boardingPoint: "Cruce Av. La Marina con Av. Universitaria (Paradero Plaza San Miguel)",
+      status: "Confirmada",
+      createdAt: "2026-11-11T14:20:00Z"
+    },
+    {
+      id: "res-502",
+      routeId: "ruta-102",
+      passengerId: "usr-04",
+      passengerName: "Ana Torres (Ficticio)",
+      passengerEmail: "ana.torres@tecsup.edu.pe",
+      passengerCareer: "Mecatrónica Industrial - 4to Ciclo",
+      boardingPoint: "Paradero puente peatonal La Rambla San Borja (Av. Javier Prado Este)",
+      status: "Confirmada",
+      createdAt: "2026-11-11T15:00:00Z"
+    },
+    {
+      id: "res-503",
+      routeId: "ruta-102",
+      passengerId: "usr-03",
+      passengerName: "Jorge Mendoza (Ficticio)",
+      passengerEmail: "jorge.mendoza@tecsup.edu.pe",
+      passengerCareer: "Diseño y Desarrollo de Software - 4to Ciclo",
+      boardingPoint: "Paradero puente peatonal La Rambla San Borja (Av. Javier Prado Este)",
+      status: "Confirmada",
+      createdAt: "2026-11-11T16:10:00Z"
+    }
+  ]
+};
+
+function getLocalDb() {
+  const raw = localStorage.getItem('ecoruta_persistent_db_v1');
+  if (!raw) {
+    localStorage.setItem('ecoruta_persistent_db_v1', JSON.stringify(INITIAL_DEMO_DATA));
+    return JSON.parse(JSON.stringify(INITIAL_DEMO_DATA));
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    return JSON.parse(JSON.stringify(INITIAL_DEMO_DATA));
+  }
+}
+
+function saveLocalDb(db) {
+  localStorage.setItem('ecoruta_persistent_db_v1', JSON.stringify(db));
+}
+
+function handleLocalApi(url, options = {}) {
+  const method = (options.method || 'GET').toUpperCase();
+  const body = options.body ? JSON.parse(options.body) : {};
+  const parsed = new URL(url, window.location.origin);
+  const pathname = parsed.pathname.replace(/.*\/api/, '/api');
+  const db = getLocalDb();
+
+  if (pathname === '/api/auth/login' && method === 'POST') {
+    const cleanEmail = (body.email || '').trim().toLowerCase();
+    if (!cleanEmail.endsWith('@tecsup.edu.pe')) {
+      return {
+        status: 403,
+        data: {
+          ok: false,
+          code: 'NON_INSTITUTIONAL_EMAIL',
+          message: 'Acceso restringido: Solo se permiten correos institucionales con dominio @tecsup.edu.pe para garantizar una comunidad verificada.'
+        }
+      };
+    }
+    const user = db.users.find(u => u.email.toLowerCase() === cleanEmail && u.password === body.password);
+    if (!user) {
+      return {
+        status: 401,
+        data: { ok: false, message: 'Credenciales incorrectas. Usa uno de los usuarios de prueba @tecsup.edu.pe.' }
+      };
+    }
+    const { password: _, ...safeUser } = user;
+    return { status: 200, data: { ok: true, user: safeUser } };
+  }
+
+  if (pathname === '/api/routes' && method === 'GET') {
+    const zone = (parsed.searchParams.get('zone') || '').trim().toLowerCase();
+    const time = (parsed.searchParams.get('time') || '').trim();
+    const onlyAvailable = parsed.searchParams.get('onlyAvailable') === 'true';
+
+    let routes = db.routes.map(r => ({
+      ...r,
+      passengers: db.reservations.filter(rv => rv.routeId === r.id && rv.status === 'Confirmada')
+    }));
+
+    if (zone) {
+      routes = routes.filter(r => r.originZone.toLowerCase().includes(zone) || r.fixedStop.toLowerCase().includes(zone));
+    }
+    if (time) {
+      routes = routes.filter(r => r.departureTime.startsWith(time));
+    }
+    if (onlyAvailable) {
+      routes = routes.filter(r => r.availableSeats > 0 && r.status === 'Activa');
+    }
+    return { status: 200, data: { ok: true, routes } };
+  }
+
+  if (pathname === '/api/routes' && method === 'POST') {
+    const driver = db.users.find(u => u.id === body.driverId);
+    if (!driver || driver.role !== 'conductor') {
+      return { status: 403, data: { ok: false, message: 'Solo un estudiante con rol Conductor puede publicar rutas.' } };
+    }
+    const seatsNum = Number(body.totalSeats);
+    const contributionNum = Number(body.contributionSoles);
+    if (!Number.isInteger(seatsNum) || seatsNum < 1 || seatsNum > 4) {
+      return { status: 400, data: { ok: false, message: 'El número de asientos disponibles debe estar entre 1 y 4.' } };
+    }
+    const newRoute = {
+      id: 'ruta-' + (100 + db.routes.length + 1),
+      driverId: driver.id,
+      driverName: driver.name,
+      driverCareer: driver.career,
+      driverVehicle: driver.vehicle || 'Vehículo particular verificado',
+      originZone: (body.originZone || '').trim(),
+      destination: 'Campus Tecsup Santa Anita',
+      departureTime: (body.departureTime || '').trim(),
+      estimatedArrival: (body.estimatedArrival || '').trim(),
+      fixedStop: (body.fixedStop || '').trim(),
+      contributionSoles: Number(contributionNum.toFixed(2)),
+      totalSeats: seatsNum,
+      availableSeats: seatsNum,
+      status: 'Activa',
+      notes: (body.notes || 'Salida puntual desde el paradero fijo acordado.').trim(),
+      createdAt: new Date().toISOString()
+    };
+    db.routes.unshift(newRoute);
+    saveLocalDb(db);
+    return { status: 201, data: { ok: true, message: 'Ruta publicada exitosamente con paradero fijo y cupos controlados.', route: newRoute } };
+  }
+
+  if (pathname === '/api/reservations' && method === 'POST') {
+    const route = db.routes.find(r => r.id === body.routeId);
+    const passenger = db.users.find(u => u.id === body.passengerId);
+    if (!route || !passenger) {
+      return { status: 404, data: { ok: false, message: 'Ruta o pasajero no encontrado.' } };
+    }
+    const existing = db.reservations.find(rv => rv.routeId === route.id && rv.passengerId === passenger.id && rv.status === 'Confirmada');
+    if (existing) {
+      return { status: 409, data: { ok: false, message: 'Ya tienes una reserva confirmada en esta ruta.' } };
+    }
+    if (route.availableSeats <= 0 || route.status === 'Completa') {
+      return { status: 409, data: { ok: false, message: 'Ruta Completa (0 asientos disponibles): El sistema impide nuevas reservas.' } };
+    }
+    route.availableSeats -= 1;
+    if (route.availableSeats === 0) route.status = 'Completa';
+    const newRes = {
+      id: 'res-' + (500 + db.reservations.length + 1),
+      routeId: route.id,
+      passengerId: passenger.id,
+      passengerName: passenger.name,
+      passengerEmail: passenger.email,
+      passengerCareer: passenger.career,
+      boardingPoint: route.fixedStop,
+      status: 'Confirmada',
+      createdAt: new Date().toISOString()
+    };
+    db.reservations.push(newRes);
+    saveLocalDb(db);
+    return {
+      status: 201,
+      data: {
+        ok: true,
+        message: `Reserva confirmada en el paradero fijo: ${route.fixedStop}. Quedan ${route.availableSeats} asiento(s).`,
+        reservation: newRes,
+        route
+      }
+    };
+  }
+
+  if (pathname.startsWith('/api/reservations/') && method === 'DELETE') {
+    const resId = pathname.split('/')[3];
+    const reservation = db.reservations.find(r => r.id === resId);
+    if (!reservation) return { status: 404, data: { ok: false, message: 'Reserva no encontrada.' } };
+    reservation.status = 'Cancelada';
+    const route = db.routes.find(r => r.id === reservation.routeId);
+    if (route) {
+      route.availableSeats = Math.min(route.totalSeats, route.availableSeats + 1);
+      if (route.availableSeats > 0) route.status = 'Activa';
+    }
+    saveLocalDb(db);
+    return { status: 200, data: { ok: true, message: 'Reserva cancelada correctamente. El asiento ha sido liberado (+1).', reservation, route } };
+  }
+
+  if (pathname === '/api/my-trips' && method === 'GET') {
+    const userId = parsed.searchParams.get('userId');
+    const driverRoutes = db.routes
+      .filter(r => r.driverId === userId)
+      .map(r => ({
+        ...r,
+        passengers: db.reservations.filter(rv => rv.routeId === r.id && rv.status === 'Confirmada')
+      }));
+    const passengerReservations = db.reservations
+      .filter(rv => rv.passengerId === userId && rv.status === 'Confirmada')
+      .map(rv => ({
+        ...rv,
+        route: db.routes.find(r => r.id === rv.routeId)
+      }));
+    return { status: 200, data: { ok: true, driverRoutes, passengerReservations } };
+  }
+
+  if (pathname === '/api/reset' && method === 'POST') {
+    localStorage.setItem('ecoruta_persistent_db_v1', JSON.stringify(INITIAL_DEMO_DATA));
+    return { status: 200, data: { ok: true, message: 'Datos ficticios de demostración restaurados correctamente.' } };
+  }
+
+  return { status: 404, data: { ok: false, message: 'Endpoint no encontrado' } };
+}
+
 async function apiRequest(url, options = {}) {
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options
-  });
-  const data = await res.json();
-  return { status: res.status, data };
+  try {
+    const res = await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options
+    });
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok || (res.status >= 400 && res.status < 500 && contentType.includes('application/json'))) {
+      const data = await res.json();
+      return { status: res.status, data };
+    }
+    return handleLocalApi(url, options);
+  } catch (e) {
+    return handleLocalApi(url, options);
+  }
 }
 
 function updateSessionUI() {
